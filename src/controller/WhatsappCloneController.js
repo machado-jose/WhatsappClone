@@ -55,7 +55,6 @@ class WhatsappCloneController
 		{
 			for(let name in styles)
 			{
-				console.log(name);
 				this.style[name] = styles[name];
 			}
 			return this;
@@ -146,6 +145,48 @@ class WhatsappCloneController
 		this.el.formPanelAddContact.on('submit', (e)=>{
 			e.preventDefault();
 		});
+
+		this.el.contactsMessagesList.querySelectorAll('.contact-item').forEach(item=>{
+			item.on('click', e=>{
+				this.el.home.hide();
+				this.el.main.css({
+					display: "flex"
+				});
+			});
+		});
+
+		let closeMenuAttach = ()=>{
+			this.el.menuAttach.removeClass('open');
+			document.removeEventListener('click', closeMenuAttach);	
+		}
+
+		this.el.btnAttach.on('click', e=>{
+			//Para evitar que os eventos propagem para os nós ancestrais
+			//Se não colocar essa linha, os eventos dos elementos ancestrais
+			//seriam removidos também
+			e.stopPropagation();
+			this.el.menuAttach.addClass('open');
+			//Para remover um evento, é necessário que a função em questão não seja
+			//anônima
+			document.addEventListener('click', closeMenuAttach);
+		});
+
+		this.el.btnAttachCamera.on('click', e=>{
+
+		});
+
+		this.el.btnAttachPhoto.on('click', e=>{
+
+		});
+
+		this.el.btnAttachDocument.on('click', e=>{
+
+		});
+
+		this.el.btnAttachContact.on('click', e=>{
+
+		});
+
 	}
 
 	closeAllPanelLeft()
@@ -153,4 +194,5 @@ class WhatsappCloneController
 		this.el.panelEditProfile.hide();
 		this.el.panelAddContact.hide();
 	}
+
 }
