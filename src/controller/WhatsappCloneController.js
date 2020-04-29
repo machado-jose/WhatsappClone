@@ -9,6 +9,8 @@ class WhatsappCloneController
 		//Carregar automaticamente os elementos html. Para isso, os nomes dos id devem
 		//seguir o padrao nome-nome
 		this.loadElements();
+		//Método para iniciar todos os eventos dos elementos
+		this.initEvents();
 
 	}
 
@@ -81,5 +83,38 @@ class WhatsappCloneController
 		{
 			return this.classList.contains(name);
 		}
+	}
+
+	initEvents()
+	{
+		this.el.myPhoto.on('click', ()=>{
+			this.closeAllPanelLeft();
+			this.el.panelEditProfile.show();
+			setTimeout(()=>{
+				this.el.panelEditProfile.addClass('open');
+			}, 300);
+		});
+
+		this.el.btnNewContact.on('click', ()=>{
+			this.closeAllPanelLeft();
+			this.el.panelAddContact.show();
+			setTimeout(()=>{
+				this.el.panelAddContact.addClass('open');
+			}, 300);	
+		});
+
+		this.el.btnClosePanelEditProfile.on('click', ()=>{
+			this.el.panelEditProfile.removeClass('open');
+		});
+
+		this.el.btnClosePanelAddContact.on('click', ()=>{
+			this.el.panelAddContact.removeClass('open');
+		});
+	}
+
+	closeAllPanelLeft()
+	{
+		this.el.panelEditProfile.hide();
+		this.el.panelAddContact.hide();
 	}
 }
