@@ -103,7 +103,7 @@ class WhatsappCloneController
 	initEvents()
 	{
 		this.el.myPhoto.on('click', ()=>{
-			this.closeAllPanelLeft();
+			this.closeAllLeftPanel();
 			this.el.panelEditProfile.show();
 			setTimeout(()=>{
 				this.el.panelEditProfile.addClass('open');
@@ -111,7 +111,7 @@ class WhatsappCloneController
 		});
 
 		this.el.btnNewContact.on('click', ()=>{
-			this.closeAllPanelLeft();
+			this.closeAllLeftPanel();
 			this.el.panelAddContact.show();
 			setTimeout(()=>{
 				this.el.panelAddContact.addClass('open');
@@ -171,28 +171,72 @@ class WhatsappCloneController
 			document.addEventListener('click', closeMenuAttach);
 		});
 
-		this.el.btnAttachCamera.on('click', e=>{
-
-		});
-
+		//Anexar Imagem
 		this.el.btnAttachPhoto.on('click', e=>{
-
+			this.el.inputPhoto.click();
 		});
 
+		this.el.inputPhoto.on('change', e=>{
+			[...this.el.inputPhoto.files].forEach(file=>{
+				console.dir(file);
+			});
+		});
+		//Tirar foto
+		this.el.btnAttachCamera.on('click', e=>{
+			this.closeAllMainPanel();
+			this.el.panelCamera.addClass("open");
+			this.el.panelCamera.css({
+				height:"100%"
+			});
+		});
+
+		this.el.btnClosePanelCamera.on('click', e=>{
+			this.closeAllMainPanel();
+			this.el.panelMessagesContainer.show();
+		});
+
+		this.el.btnTakePicture.on('click', e=>{
+			console.dir(e);
+		});
+		//Anexar documento
 		this.el.btnAttachDocument.on('click', e=>{
-
+			this.closeAllMainPanel();
+			this.el.panelDocumentPreview.addClass("open");
+			this.el.panelDocumentPreview.css({
+				height:"100%"
+			});
 		});
 
-		this.el.btnAttachContact.on('click', e=>{
+		this.el.btnClosePanelDocumentPreview.on('click', e=>{
+			this.closeAllMainPanel();
+			this.el.panelMessagesContainer.show();
+		});
 
+		this.el.btnSendDocument.on('click', e=>{
+			console.log('send document');
+		});
+		//Anexar contatos
+		this.el.btnAttachContact.on('click', e=>{
+			this.el.modalContacts.show();
+		});
+
+		this.el.btnCloseModalContacts.on('click', e=>{
+			this.el.modalContacts.hide();
 		});
 
 	}
 
-	closeAllPanelLeft()
+	closeAllLeftPanel()
 	{
 		this.el.panelEditProfile.hide();
 		this.el.panelAddContact.hide();
+	}
+
+	closeAllMainPanel()
+	{
+		this.el.panelMessagesContainer.hide();
+		this.el.panelDocumentPreview.removeClass("open");
+		this.el.panelDocumentPreview.removeClass("open");
 	}
 
 }
