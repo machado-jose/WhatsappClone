@@ -1,0 +1,25 @@
+{
+  "name": "whatsappclone",
+  "version": "1.0.0",
+  "description": "[![Hcode Treinamentos](https://www.hcode.com.br/res/img/hcode-200x100.png)](https://www.hcode.com.br)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js",
+    "start": "webpack-dev-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/machado-jose/WhatsappClone.git"
+  },
+  "author": "Jose Gustavo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/machado-jose/WhatsappClone/issues"
+  },
+  "homepage": "https://github.com/machado-jose/WhatsappClone#readme",
+  "dependencies": {
+    "webpack": "^3.1.0",
+    "webpack-dev-server": "^2.5.1"
+  }
+}
