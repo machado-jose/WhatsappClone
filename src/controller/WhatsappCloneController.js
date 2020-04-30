@@ -291,7 +291,25 @@ class WhatsappCloneController
 					img.classList.add(name);
 				});
 
-				this.el.inputText.appendChild(img);
+				//Para determinar a posição que o usuário quer inserir o emoji
+				//1º Focar (Selecionar) o cursor no campo
+				let cursor = window.getSelection();
+				if(!cursor.focusNode || !cursor.focusNode.id == 'input-text')
+				{
+					this.el.inputText.focus();
+					cursor = window.getSelection();
+				}
+				//2º Capturar o range da informação selecionada e deletar
+				let range = document.createRange();
+				range = cursor.getRangeAt(0);
+				range.deleteContents();
+				//3º Inserir o emoji
+				let frag = document.createDocumentFragment();
+				frag.appendChild(img);
+				range.insertNode(frag);
+				range.setStartAfter(img);
+
+
 				this.el.inputText.dispatchEvent(new Event('keyup'));
 			});
 		});
