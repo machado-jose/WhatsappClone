@@ -224,6 +224,21 @@ class WhatsappCloneController
 			this.el.modalContacts.hide();
 		});
 
+		//Configurar evento do microfone
+		this.el.btnSendMicrophone.on('click', e=>{
+			this.el.recordMicrophone.show();
+			this.el.btnSendMicrophone.hide();
+			this.recordMicrophoneTime();
+		});
+
+		this.el.btnCancelMicrophone.on('click', e=>{
+			this.closeRecordMicrophone();
+		});
+
+		this.el.btnFinishMicrophone.on('click', e=>{
+			this.closeRecordMicrophone();
+		});
+
 	}
 
 	closeAllLeftPanel()
@@ -237,6 +252,21 @@ class WhatsappCloneController
 		this.el.panelMessagesContainer.hide();
 		this.el.panelDocumentPreview.removeClass("open");
 		this.el.panelDocumentPreview.removeClass("open");
+	}
+
+	closeRecordMicrophone()
+	{
+		clearInterval(this._recordMicrophoneInterval);
+		this.el.recordMicrophone.hide();
+		this.el.btnSendMicrophone.show();
+	}
+
+	recordMicrophoneTime()
+	{
+		let start = Date.now();
+		this._recordMicrophoneInterval = setInterval(()=>{
+			this.el.recordMicrophoneTimer.innerHTML = (Date.now() - start);
+		}, 100);
 	}
 
 }
