@@ -268,8 +268,10 @@ class WhatsappCloneController
 		});
 
 		let closeEmojisPanel = (e)=>{
-			if(e.key === 'Escape') this.el.panelEmojis.removeClass('open');
-			document.removeEventListener('keyup', closeEmojisPanel);
+			if(e.key === 'Escape'){
+				this.el.panelEmojis.removeClass('open');
+				document.removeEventListener('keyup', closeEmojisPanel);
+			}
 		};
 
 		this.el.btnEmojis.on('click', e=>{
@@ -279,7 +281,18 @@ class WhatsappCloneController
 
 		this.el.panelEmojis.querySelectorAll('.emojik').forEach(emoji=>{
 			emoji.on('click', e=>{
-				console.log(emoji.dataset.unicode);
+
+				let img = this.el.imgEmojiDefault.cloneNode();
+				img.style.cssText = emoji.style.cssText;
+				img.dataset.unicode = emoji.dataset.unicode;
+				img.alt = emoji.dataset.unicode;
+
+				emoji.classList.forEach(name=>{
+					img.classList.add(name);
+				});
+
+				this.el.inputText.appendChild(img);
+				this.el.inputText.dispatchEvent(new Event('keyup'));
 			});
 		});
 
