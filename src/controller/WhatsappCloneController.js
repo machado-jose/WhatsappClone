@@ -1,5 +1,6 @@
 import {CameraController} from './CameraController';
 import {Format} from './../utils/Format';
+import {DocumentPreviewController} from './DocumentPreviewController';
 
 export class WhatsappCloneController
 {
@@ -201,7 +202,26 @@ export class WhatsappCloneController
 		});
 
 		this.el.btnTakePicture.on('click', e=>{
-			console.dir(e);
+			let dataURL = this._camera.takePicture();
+			this.el.pictureCamera.src = dataURL;
+
+			this.el.pictureCamera.show();
+			this.el.videoCamera.hide();
+			this.el.btnReshootPanelCamera.show();
+			this.el.containerSendPicture.show();
+			this.el.containerTakePicture.hide();
+		});
+
+		this.el.btnReshootPanelCamera.on('click', e=>{
+			this.el.pictureCamera.hide();
+			this.el.videoCamera.show();
+			this.el.btnReshootPanelCamera.hide();
+			this.el.containerSendPicture.hide();
+			this.el.containerTakePicture.show();
+		});
+
+		this.el.btnSendPicture.on('click', e=>{
+			console.log(this.el.pictureCamera.src);
 		});
 		//Anexar documento
 		this.el.btnAttachDocument.on('click', e=>{
@@ -210,6 +230,38 @@ export class WhatsappCloneController
 			this.el.panelDocumentPreview.css({
 				height:"100%"
 			});
+			this.el.inputDocument.click();
+		});
+
+		this.el.inputDocument.on('change', e=>{
+			if(this.el.inputDocument.files.length)
+			{
+				let file = this.el.inputDocument.files[0];
+
+				this._documentPreviewController = new DocumentPreviewController(file);
+				this._documentPreviewController.getPreviewFile().then(data=>{
+					this.el.imgPanelDocumentPreview.src = data.src;
+					this.el.infoPanelDocumentPreview.innerHTML = data.info;
+					this.el.imagePanelDocumentPreview.show();
+					this.el.filePanelDocumentPreview.hide();
+				}).catch(err=>{
+					switch(file.type)
+					{
+						case 'application/vnd.oasis.opendocument.spreadsheet':
+							this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-xls';
+						break;
+						case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+							this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-doc';
+						break;
+						default:
+							this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
+					}
+
+					this.el.imagePanelDocumentPreview.hide();
+					this.el.filePanelDocumentPreview.show();
+					this.el.filenamePanelDocumentPreview.innerHTML = file.name;
+				});
+			}
 		});
 
 		this.el.btnClosePanelDocumentPreview.on('click', e=>{
