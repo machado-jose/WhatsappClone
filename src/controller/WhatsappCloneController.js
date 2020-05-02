@@ -291,19 +291,19 @@ export class WhatsappCloneController
 			this._microphoneController = new MicrophoneController();
 
 			//Esse evento foi criado no ClassEvent
-			this._microphoneController.on('play', musica=>{
-				console.log('Recebi o evento', musica);
+			this._microphoneController.on('ready', (musica)=>{
+				this._microphoneController.startRecord();
 			});
 		});
 
 		this.el.btnCancelMicrophone.on('click', e=>{
 			this.closeRecordMicrophone();
-			this._microphoneController.stop();
+			this._microphoneController.stopRecord();
 		});
 
 		this.el.btnFinishMicrophone.on('click', e=>{
 			this.closeRecordMicrophone();
-			this._microphoneController.stop();
+			this._microphoneController.stopRecord();
 		});
 
 		//Configurar o campo da mensagem
