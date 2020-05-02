@@ -1,4 +1,5 @@
 import {CameraController} from './CameraController';
+import {MicrophoneController} from './MicrophoneController';
 import {Format} from './../utils/Format';
 import {DocumentPreviewController} from './DocumentPreviewController';
 
@@ -286,6 +287,8 @@ export class WhatsappCloneController
 			this.el.recordMicrophone.show();
 			this.el.btnSendMicrophone.hide();
 			this.recordMicrophoneTime();
+
+			this._microphoneController = new MicrophoneController();
 		});
 
 		this.el.btnCancelMicrophone.on('click', e=>{
