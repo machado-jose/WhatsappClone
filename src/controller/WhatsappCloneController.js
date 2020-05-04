@@ -1,6 +1,7 @@
 import {CameraController} from './CameraController';
 import {MicrophoneController} from './MicrophoneController';
 import {Format} from './../utils/Format';
+import {Firebase} from './../utils/Firebase';
 import {DocumentPreviewController} from './DocumentPreviewController';
 
 export class WhatsappCloneController
@@ -16,7 +17,30 @@ export class WhatsappCloneController
 		this.loadElements();
 		//Método para iniciar todos os eventos dos elementos
 		this.initEvents();
+		//Iniciar a aplicação firebase
+		this._firebase = new Firebase();
+		//Iniciar a autentificação
+		this.initAuth();
 
+	}
+
+	/**
+	* @function Autentifica o usuário na aplicação
+	*/
+
+	initAuth()
+	{
+		this._firebase.initAuth().then((response)=>{
+			
+			this.el.appContent.css({
+				display: 'flex'
+			});
+
+			this._user = response.user;
+			this._token = response.token
+		}).catch(err=>{
+			console.error(err);
+		});
 	}
 
 	loadElements()
@@ -286,24 +310,31 @@ export class WhatsappCloneController
 		this.el.btnSendMicrophone.on('click', e=>{
 			this.el.recordMicrophone.show();
 			this.el.btnSendMicrophone.hide();
-			this.recordMicrophoneTime();
 
 			this._microphoneController = new MicrophoneController();
 
 			//Esse evento foi criado no ClassEvent
-			this._microphoneController.on('ready', (musica)=>{
+			this._microphoneController.on('ready', (audio, e)=>{
 				this._microphoneController.startRecord();
+			});
+
+			this._microphoneController.on('timeRecord', time=>{
+				this.el.recordMicrophoneTimer.innerHTML = time;
 			});
 		});
 
 		this.el.btnCancelMicrophone.on('click', e=>{
-			this.closeRecordMicrophone();
 			this._microphoneController.stopRecord();
+			this.el.recordMicrophoneTimer.innerHTML = Format.toTime(0);
+			this.el.recordMicrophone.hide();
+			this.el.btnSendMicrophone.show();
 		});
 
 		this.el.btnFinishMicrophone.on('click', e=>{
-			this.closeRecordMicrophone();
 			this._microphoneController.stopRecord();
+			this.el.recordMicrophoneTimer.innerHTML = Format.toTime(0);
+			this.el.recordMicrophone.hide();
+			this.el.btnSendMicrophone.show();
 		});
 
 		//Configurar o campo da mensagem
@@ -395,21 +426,6 @@ export class WhatsappCloneController
 		this.el.panelCamera.removeClass("open");
 		this.el.panelDocumentPreview.removeClass("open");
 		this.el.panelDocumentPreview.removeClass("open");
-	}
-
-	closeRecordMicrophone()
-	{
-		clearInterval(this._recordMicrophoneInterval);
-		this.el.recordMicrophone.hide();
-		this.el.btnSendMicrophone.show();
-	}
-
-	recordMicrophoneTime()
-	{
-		let start = Date.now();
-		this._recordMicrophoneInterval = setInterval(()=>{
-			this.el.recordMicrophoneTimer.innerHTML = (Format.toTime(Date.now() - start));
-		}, 100);
 	}
 
 }

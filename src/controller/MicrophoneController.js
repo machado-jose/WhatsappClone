@@ -6,6 +6,7 @@ arquivo desejado.
 */
 
 import {ClassEvent} from './../utils/ClassEvent';
+import {Format} from './../utils/Format';
 
 export class MicrophoneController extends ClassEvent
 {
@@ -58,6 +59,7 @@ export class MicrophoneController extends ClassEvent
 			this._mediaRecorder = new MediaRecorder(this._stream, {
 				mimeType: this._mimetype
 			});
+			this.startRecordMicrophoneTime();
 
 			//O MediaRecorder envia pedaços do audio
 			this._recordedChunks = [];
@@ -80,6 +82,13 @@ export class MicrophoneController extends ClassEvent
 
 				console.log(file);
 
+				let reader = new FileReader();
+				reader.onload = e=>{
+					let audio = new Audio(reader.result);
+					audio.play();
+				};
+				reader.readAsDataURL(file);
+
 			});
 
 			this._mediaRecorder.start();
@@ -92,6 +101,20 @@ export class MicrophoneController extends ClassEvent
 		{
 			this._mediaRecorder.stop();
 			this.stop();
+			this.stopRecordMicrophoneTime();
 		}
+	}
+
+	stopRecordMicrophoneTime()
+	{
+		clearInterval(this._recordMicrophoneInterval);
+	}
+
+	startRecordMicrophoneTime()
+	{
+		let start = Date.now();
+		this._recordMicrophoneInterval = setInterval(()=>{
+			this.trigger('timeRecord', Format.toTime(Date.now() - start));
+		}, 100);
 	}
 }
