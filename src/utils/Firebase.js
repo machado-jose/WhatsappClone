@@ -5,7 +5,7 @@ export class Firebase
 {
 	constructor()
 	{
-		this._initialized = false;
+		window._initializedFirebase = false;
 
 		this._config = {
 		    apiKey: "AIzaSyCALZ31ug5ZIHlI0T1bBMJqLQHgnEgvOEc",
@@ -22,26 +22,27 @@ export class Firebase
 
 	init()
 	{
-		if(!this._initialized)
+		if(!window._initializedFirebase)
 		{
 			firebase.initializeApp(this._config);
-			this._initialized = true;
+			window._initializedFirebase = true;
 		}
 	  	
 	}
 
-	db()
+	static db()
 	{
 		return firebase.firestore();
 	}
 
-	hd()
+	static hd()
 	{
 		return firebase.storage();
 	}
 
 	/**
 	* @function Autentifica o usuário usando a sua conta de email do Google
+	* @returns Promise
 	*/
 	initAuth()
 	{
