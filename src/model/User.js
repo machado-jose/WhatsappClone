@@ -47,6 +47,16 @@ export class User extends Model
 		return Firebase.db().collection('/users');
 	}
 	/**
+	* Obter a coleção referente aos contatos do usuários no Firebase
+	* @param {string} id - O ID do usuário
+	* @returns {Promise} No caso de sucesso, será retornado a coleção dos contatos do usuário. Caso contrário,
+	* será retornado um Obejct com os dados do erro
+	*/
+	static getContactsRef(id)
+	{
+		return User.findByEmail(id).collection('contacts');
+	}
+	/**
 	* Encontrar os dados do usuário por meio da sua conta de email
 	* @param {string} email - O email do usuário
 	* @returns {Promise} No caso de sucesso, será retornado um Object com os dados do usuário salvo no Firebase. 
@@ -64,6 +74,26 @@ export class User extends Model
 	*/
 	addContact(contact)
 	{
-		return User.getRef().doc(this.email).collection('contacts').doc(btoa(contact.email)).set(contact.toJSON());
+		return User.getContactsRef(this.email).doc(btoa(contact.email)).set(contact.toJSON());
+	}
+	/**
+	* Busca os contatos salvos do usuário
+	* @returns {Promise} No caso de sucesso, será retornado um Object com todos os contatos pertecente ao usuário.
+	*/
+	getContacts()
+	{
+		return new Promise((s, f)=>{
+			User.getContactsRef(this.email).onSnapshot(docs=>{
+				let contacts = [];
+				docs.forEach(doc=>{
+					let data = doc.data();
+					data.id = doc.id;
+					contacts.push(data);
+				});
+
+				this.trigger('contactschange', docs);
+				s(contacts);
+			});
+		});
 	}
 }
