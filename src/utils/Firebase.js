@@ -41,8 +41,9 @@ export class Firebase
 	}
 
 	/**
-	* @function Autentifica o usuário usando a sua conta de email do Google
-	* @returns Promise
+	* Autentifica o usuário usando a sua conta de email do Google
+	* @returns {Promise} No caso de sucesso, retorna um Object contendo os dados do usuário e o token gerado. 
+	* Caso contrário, retorna um Object com os dados do erro
 	*/
 	initAuth()
 	{

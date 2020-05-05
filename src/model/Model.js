@@ -8,8 +8,8 @@ export class Model extends ClassEvent
 		this._data = {};
 	}
 	/**
-	* @function fromJSON
-	* @param json : Contém os dados para serem salvos na variável this._data.
+	* Salva os dados e aciona o evento 'datachange'
+	* @param {Object} json - Contém os dados para serem salvos na variável this._data.
 	*/
 	fromJSON(json)
 	{
@@ -17,8 +17,8 @@ export class Model extends ClassEvent
 		this.trigger('datachange', this.toJSON());
 	}
 	/**
-	* @function toJSON
-	* @returns this._data : Contém os dados salvos no formato JSON.
+	* Retorna os dados do objeto
+	* @returns {Object} this._data
 	*/
 	toJSON()
 	{

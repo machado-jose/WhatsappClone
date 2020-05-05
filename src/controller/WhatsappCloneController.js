@@ -26,8 +26,7 @@ export class WhatsappCloneController
 	}
 
 	/**
-	* initAuth()
-	* @function Autentifica o usuário na aplicação
+	* Autentifica o usuário na aplicação
 	*/
 
 	initAuth()
@@ -55,9 +54,14 @@ export class WhatsappCloneController
 				}
 			});
 
+			//Problema da atualização pode está nesse trecho
+			//***********************************************//
+
 			this._user.name = response.user.displayName;
 			this._user.email = response.user.email;
 			this._user.photo = response.user.photoURL;
+
+			//************************************************//
 
 			this._user.save().then(()=>{
 				this.el.appContent.css({
@@ -195,11 +199,35 @@ export class WhatsappCloneController
 		});
 
 		this.el.btnSavePanelEditProfile.on('click', (e)=>{
-			console.log(this.el.inputNamePanelEditProfile.innerHTML);
+			this.el.btnSavePanelEditProfile.disabled = true;
+			this._user.name = this.el.inputNamePanelEditProfile.innerHTML;
+			this._user.save().then(()=>{
+				this.el.btnSavePanelEditProfile.disabled = false;
+			});
 		});
 
 		this.el.formPanelAddContact.on('submit', (e)=>{
+
 			e.preventDefault();
+
+			//toJSON - Evento criado
+			let infoContact = this.el.formPanelAddContact.toJSON();
+			let contact = new User(infoContact.email);
+			contact.on('datachange', data=>{
+				if(data.name)
+				{
+					this._user.addContact(contact).then(()=>{
+						this.el.btnClosePanelAddContact.click();
+						console.info("Contato adicionado");
+
+					});
+				}
+				else
+				{
+					console.error("Usuário não foi encontrado.");
+				}
+			});
+
 		});
 
 		this.el.contactsMessagesList.querySelectorAll('.contact-item').forEach(item=>{
