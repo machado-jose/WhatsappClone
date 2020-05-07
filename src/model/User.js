@@ -16,6 +16,8 @@ export class User extends Model
 	set email(value){ this._data.email = value; }
 	get photo(){ return this._data.photo; }
 	set photo(value){ this._data.photo = value; }
+	get chatId(){ return this._data.chatId; }
+	set chatId(value){ this._data.chatId = value; }
 	/**
 	* Busca os dados do usuário a partir do seu ID
 	* @param {string} id - O identificador do documento do usuário salvo no Firebase

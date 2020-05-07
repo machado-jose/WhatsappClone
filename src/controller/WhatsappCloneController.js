@@ -4,6 +4,7 @@ import {Format} from './../utils/Format';
 import {Firebase} from './../utils/Firebase';
 import {DocumentPreviewController} from './DocumentPreviewController';
 import {User} from './../model/User';
+import {Chat} from './../model/Chat';
 
 export class WhatsappCloneController
 {
@@ -78,7 +79,6 @@ export class WhatsappCloneController
 
 	/**
 	* Adiciona os contatos do usuário na lista de Contatos
-	*
 	*/
 
 	initContacts()
@@ -320,10 +320,19 @@ export class WhatsappCloneController
 			contact.on('datachange', data=>{
 				if(data.name)
 				{
-					this._user.addContact(contact).then(()=>{
-						this.el.btnClosePanelAddContact.click();
-						console.info("Contato adicionado");
-
+					/*
+					* No momento que verifica se existe o contato no BD, o chat
+					* entre o usuário e o contato é criado, mesmo que não existe
+					* uma troca de mensagem efetivamente
+					*/
+					Chat.createIfNotExists(this._user.email, contact.email).then(chat=>{
+						contact.chatId = chat.id;
+						this._user.chatId = chat.id;
+						contact.addContact(this._user);
+						this._user.addContact(contact).then(()=>{
+							this.el.btnClosePanelAddContact.click();
+							console.info("Contato adicionado");
+						});
 					});
 				}
 				else
