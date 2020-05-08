@@ -320,6 +320,14 @@ export class WhatsappCloneController
 
 	initEvents()
 	{
+		this.el.inputSearchContacts.on('keyup', ()=>{
+			(this.el.inputSearchContacts.value.length > 0) ? 
+				this.el.inputSearchContactsPlaceholder.hide() :
+				this.el.inputSearchContactsPlaceholder.show();
+
+			this._user.getContacts(this.el.inputSearchContacts.value);
+		});
+
 		this.el.myPhoto.on('click', ()=>{
 			this.closeAllLeftPanel();
 			this.el.panelEditProfile.show();

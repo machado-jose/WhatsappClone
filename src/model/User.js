@@ -80,12 +80,13 @@ export class User extends Model
 	}
 	/**
 	* Busca os contatos salvos do usuário
+	* @param {string} filter - Informação para ser utilizada para a filtragem dos contatos
 	* @returns {Promise} No caso de sucesso, será retornado um Object com todos os contatos pertecente ao usuário.
 	*/
-	getContacts()
+	getContacts(filter = '')
 	{
 		return new Promise((s, f)=>{
-			User.getContactsRef(this.email).onSnapshot(docs=>{
+			User.getContactsRef(this.email).where('name', '>=', filter).onSnapshot(docs=>{
 				let contacts = [];
 				docs.forEach(doc=>{
 					let data = doc.data();
