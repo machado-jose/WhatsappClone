@@ -17,4 +17,21 @@ export class Format
 
 		return (hours > 0) ? `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}` : `${minutes}:${seconds.toString().padStart(2, '0')}`;
 	}
+	/**
+	* Converte timeStamp para time
+	* @param {timestamp} timeStamp
+	* @returns {string}
+	*/
+	static timeStampToTime(timeStamp)
+	{
+		return (timeStamp && typeof timeStamp.toDate === 'function') ? Format.dateToTime(timeStamp.toDate()) : '';
+	}
+
+	static dateToTime(date, locale = 'pt-BR')
+	{
+		return date.toLocaleTimeString(locale, {
+			hours: '2-digit',
+			minutes: '2-digit'
+		});
+	}
 }
