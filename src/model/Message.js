@@ -1,4 +1,5 @@
 import {Model} from './Model';
+import {Firebase} from './../utils/Firebase';
 
 export class Message extends Model
 {
@@ -7,13 +8,13 @@ export class Message extends Model
 		super();
 	}
 
-	get content {return this._data.content};
+	get content() {return this._data.content};
 	set content(value) {this._data.content = value};
-	get type {return this._data.type};
+	get type() {return this._data.type};
 	set type(value) {this._data.type = value};
-	get timeStamp {return this._data.timeStamp};
+	get timeStamp() {return this._data.timeStamp};
 	set timeStamp(value) {this._data.timeStamp = value};
-	get status {return this._data.status};
+	get status() {return this._data.status};
 	set status(value) {this._data.status = value};
 	/**
 	* Determina view de acordo com o tipo da mensagem
@@ -287,5 +288,32 @@ export class Message extends Model
 		let className = (me) ? 'message-out' : 'message-in';
 		div.firstElementChild.classList.add(className);
 		return div;
+	}
+	/**
+	* Envia a mensagem para o contato
+	* @param {string} chatId - O identificador da conversa entre o usuário e o contato
+	* @param {string} from - O identificador do emissor da mensagem
+	* @param {string} type - O tipo da mensagem enviada
+	* @param {string} content - O conteúdo da mensagem
+	* @returns {Promise}
+	*/
+	static send(chatId, from, type, content)
+	{
+		return Message.getRef(chatId).add({
+			content,
+			timeStamp: new Date(),
+			status: 'wait',
+			type,
+			from
+		});
+	}
+	/** 
+	* Obtem acesso as mensagens de um determinado chat
+	* @param {string} chatId - O identificador do chat
+	* @returns {Promise}
+	*/
+	static getRef(chatId)
+	{
+		return Firebase.db().collection('/chats').doc(chatId).collection('messages');
 	}
 }

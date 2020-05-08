@@ -5,6 +5,7 @@ import {Firebase} from './../utils/Firebase';
 import {DocumentPreviewController} from './DocumentPreviewController';
 import {User} from './../model/User';
 import {Chat} from './../model/Chat';
+import {Message} from './../model/Message';
 
 export class WhatsappCloneController
 {
@@ -143,21 +144,7 @@ export class WhatsappCloneController
 			                    </div>`;
 
                 div.on('click', e=>{
-
-                	this.el.activeName.innerHTML = contact.name;
-                	this.el.activeStatus.innerHTML = contact.status;
-
-                	if(contact.photo)
-                	{
-                		let img = this.el.activePhoto;
-                		img.src = encodeURI(contact.photo);
-                		img.show();
-                	}
-
-                	this.el.home.hide();
-                	this.el.main.css({
-                		display: 'flex'
-                	});
+                	this.setActiveChat(contact);
                 });
 
                 if(contact.photo)
@@ -176,6 +163,28 @@ export class WhatsappCloneController
         }).catch(err=>{
 
         });
+	}
+	/**
+	* Carrega o layout das mensagens do usuário e o contato
+	* @param {User} contact
+	*/
+	setActiveChat(contact)
+	{
+		this._contactActive = contact;
+		this.el.activeName.innerHTML = contact.name;
+    	this.el.activeStatus.innerHTML = contact.status;
+
+    	if(contact.photo)
+    	{
+    		let img = this.el.activePhoto;
+    		img.src = encodeURI(contact.photo);
+    		img.show();
+    	}
+
+    	this.el.home.hide();
+    	this.el.main.css({
+    		display: 'flex'
+    	});
 	}
 
 	loadElements()
@@ -530,7 +539,13 @@ export class WhatsappCloneController
 		});
 
 		this.el.btnSend.on('click', e=>{
-			console.log(this.el.inputText.innerHTML);
+			Message.send(this._contactActive.chatId,
+				this._user.email,
+				'text', 
+				this.el.inputText.innerHTML
+			);
+			this.el.inputText.innerHTML = '';
+			this.el.panelEmojis.removeClass('open');
 		});
 
 		let closeEmojisPanel = (e)=>{
