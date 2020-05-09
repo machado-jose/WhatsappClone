@@ -451,7 +451,7 @@ export class WhatsappCloneController
 
 		this.el.inputPhoto.on('change', e=>{
 			[...this.el.inputPhoto.files].forEach(file=>{
-				console.dir(file);
+				Message.sendImage(this._contactActive.chatId, this._user.email, file);
 			});
 		});
 		//Tirar foto
