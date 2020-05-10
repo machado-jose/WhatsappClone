@@ -488,9 +488,51 @@ export class WhatsappCloneController
 			this.el.containerSendPicture.hide();
 			this.el.containerTakePicture.show();
 		});
-
+		/**
+		* Irá enviar a imagem da foto que foi tirada pela câmera
+		*/
 		this.el.btnSendPicture.on('click', e=>{
-			console.log(this.el.pictureCamera.src);
+
+			this.el.btnSendPicture.disabled = true;
+
+			let regex = /^data:(.+);base64,(.*)$/;
+			let result = this.el.pictureCamera.src.match(regex);
+			let mimetype = result[1];
+			let ext = mimetype.split('/')[1];
+			let filename = `camera_${Date.now()}.${ext}`;
+
+			// Para poder retirar a inversão da imagem gerada pela câmera
+			let picture = new Image();
+			picture.src = this.el.pictureCamera.src;
+			picture.onload = e=>{
+				let canvas = document.createElement('canvas');
+				let context = canvas.getContext('2d');
+
+				canvas.width = picture.width;
+				canvas.height = picture.height;
+
+				context.translate(picture.width, 0);
+				context.scale(-1, 1);
+				context.drawImage(picture, 0, 0, canvas.width, canvas.height);
+
+				fetch(canvas.toDataURL(mimetype))
+				.then(res=>{ return res.arrayBuffer(); })
+				.then(buffer=>{ return new File([buffer], filename, { type: mimetype }); })
+				.then(file=>{
+					Message.sendImage(this._contactActive.chatId, this._user.email, file);
+
+					this.el.btnSendPicture.disabled = false;
+					this.closeAllMainPanel();
+					this._camera.stop();
+					this.el.btnReshootPanelCamera.hide();
+					this.el.pictureCamera.hide();
+					this.el.videoCamera.show();
+					this.el.containerSendPicture.hide();
+					this.el.containerTakePicture.show();
+					this.el.panelMessagesContainer.show();
+				});
+			};
+
 		});
 		//Anexar documento
 		this.el.btnAttachDocument.on('click', e=>{
