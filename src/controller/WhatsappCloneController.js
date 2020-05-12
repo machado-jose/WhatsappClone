@@ -211,6 +211,8 @@ export class WhatsappCloneController
 	    		message.fromJSON(data);
 	    		let me = (data.from === this._user.email);
 
+	    		let view = message.getViewElement(me);
+
     			if(!this.el.panelMessagesContainer.querySelector('#_' + data.id))
     			{	
 
@@ -223,20 +225,46 @@ export class WhatsappCloneController
 	    				});
 	    			}
 
-	    			let view = message.getViewElement(me);
 	    			this.el.panelMessagesContainer.appendChild(view);
 
     			}
     			else
     			{
-    				let view = message.getViewElement(me);
-    				this.el.panelMessagesContainer.querySelector('#_' + data.id).innerHTML = view.innerHTML;
+
+    				let parent = this.el.panelMessagesContainer.querySelector('#_' + data.id).parentNode;
+    				parent.replaceChild(view, this.el.panelMessagesContainer.querySelector('#_' + data.id));
+
+    				/* Aula W44 - Ao atualizar a mensagem do contato, o evento de click
+    				* foi perdida por causa do innerHTML
+    				*/
+    				//this.el.panelMessagesContainer.querySelector('#_' + data.id).innerHTML = view.innerHTML;
     			}
 
     			if(this.el.panelMessagesContainer.querySelector('#_' + data.id) && me)
     			{
     				let msgEl = this.el.panelMessagesContainer.querySelector('#_' + data.id);
     				msgEl.querySelector('.message-status').innerHTML = message.getStatusViewElement().outerHTML;
+    			}
+
+    			if(message.type === 'contact')
+    			{
+    				view.querySelector('.btn-message-send').on('click', e=>{
+
+	                    Chat.createIfNotExists(this._user.email, message.content.email).then(chat=>{
+
+	                    	let contact = new User(message.content.email);
+
+	                    	contact.on('datachange', data=>{
+
+	                    		this._user.addContact(contact);
+								this._user.chatId = chat.id;
+								contact.chatId = chat.id;
+								contact.addContact(this._user);
+
+								this.setActiveChat(contact);
+	                    	});	
+						});
+	                });
     			}
     
     		});
