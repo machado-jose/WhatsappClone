@@ -691,6 +691,18 @@ export class WhatsappCloneController
 		});
 
 		this.el.btnFinishMicrophone.on('click', e=>{
+
+			this._microphoneController.on('recorded', (file, metadata)=>{
+
+				Message.sendAudio(
+					this._contactActive.chatId,
+					this._user.email,
+					file,
+					metadata,
+					this._user.photo
+				);
+			});
+
 			this._microphoneController.stopRecord();
 			this.el.recordMicrophoneTimer.innerHTML = Format.toTime(0);
 			this.el.recordMicrophone.hide();
