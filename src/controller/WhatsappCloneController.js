@@ -3,6 +3,7 @@ import {MicrophoneController} from './MicrophoneController';
 import {ContactsController} from './ContactsController';
 import {Format} from './../utils/Format';
 import {Firebase} from './../utils/Firebase';
+import {Upload} from './../utils/Upload';
 import {DocumentPreviewController} from './DocumentPreviewController';
 import {User} from './../model/User';
 import {Chat} from './../model/Chat';
@@ -13,6 +14,7 @@ export class WhatsappCloneController
 {
 	constructor()
 	{
+		this._active = true;
 		//Esse método vai permitir que vários elementos diferentes possam herdar
 		//métodos sem necessidade de especificar cada um separadamente. Semelhante 
 		//do JQuery
@@ -26,7 +28,56 @@ export class WhatsappCloneController
 		this._firebase = new Firebase();
 		//Iniciar a autentificação
 		this.initAuth();
+		//Verificar se as notificações estão habilitadas
+		this.checkNotification();
 
+	}
+
+	notification(data)
+	{
+		if(Notification.permission === 'granted' && !this._active)
+		{
+			let n = new Notification(
+				this._contactActive.name,
+				{
+					icon: this._contactActive.photo,
+					body: data.content
+				}
+			);
+
+			let sound = new Audio('./../../audio/alert.mp3');
+			sound.currentTime = 0;
+			sound.play();
+
+			setTimeout(()=>{
+				if(n) n.close;
+			}, 3000);
+		}
+	}
+
+	checkNotification()
+	{
+		if(typeof Notification === 'function')
+		{
+			if(Notification.permission !== 'granted')
+			{
+				this.el.alertNotificationPermission.show();
+			}
+			else
+			{
+				this.el.alertNotificationPermission.hide();
+			}
+
+			this.el.alertNotificationPermission.on('click', e=>{
+				Notification.requestPermission(permission=>{
+					this.el.alertNotificationPermission.hide();
+					if(permission === 'granted')
+					{
+						console.info('permissao dada!');
+					}
+				});
+			});
+		}
 	}
 
 	/**
@@ -118,7 +169,7 @@ export class WhatsappCloneController
 			                                <span dir="auto" title="${contact.name}" class="_1wjpf">${contact.name}</span>
 			                            </div>
 			                            <div class="_3Bxar">
-			                                <span class="_3T2VG">${contact.lastMessageTime}</span>
+			                                <span class="_3T2VG">${Format.timeStampToTime(contact.lastMessageTime)}</span>
 			                            </div>
 			                        </div>
 			                        <div class="_1AwDx">
@@ -196,6 +247,8 @@ export class WhatsappCloneController
 
     	this.el.panelMessagesContainer.innerHTML = '';
 
+    	this._messagesReceived = [];
+
     	Message.getRef(this._contactActive.chatId).orderBy('timeStamp').onSnapshot(docs=>{
 
     		let scrollTop = this.el.panelMessagesContainer.scrollTop;
@@ -210,6 +263,12 @@ export class WhatsappCloneController
     			let message = new Message();
 	    		message.fromJSON(data);
 	    		let me = (data.from === this._user.email);
+
+	    		if(!me && this._messagesReceived.filter(id => {return id === data.id}).length === 0)
+	    		{
+	    			this.notification(data);
+	    			this._messagesReceived.push(data.id);
+	    		}
 
 	    		let view = message.getViewElement(me);
 
@@ -370,6 +429,15 @@ export class WhatsappCloneController
 
 	initEvents()
 	{
+
+		window.addEventListener('focus', e=>{
+			this._active = true;
+		});
+
+		window.addEventListener('blur', e=>{
+			this._active = false;
+		});
+
 		this.el.inputSearchContacts.on('keyup', ()=>{
 			(this.el.inputSearchContacts.value.length > 0) ? 
 				this.el.inputSearchContactsPlaceholder.hide() :
@@ -404,6 +472,21 @@ export class WhatsappCloneController
 
 		this.el.photoContainerEditProfile.on('click', ()=>{
 			this.el.inputProfilePhoto.click();
+		});
+
+		this.el.inputProfilePhoto.on('change', ()=>{
+			if(this.el.inputProfilePhoto.files.length > 0)
+			{
+				let file = this.el.inputProfilePhoto.files[0];
+				Upload.send(file, this._user.email).then(snapshot=>{
+					snapshot.ref.getDownloadURL().then(downloadURL=>{
+						this._user.photo = downloadURL.toString();
+						this._user.save().then(()=>{
+							this.el.btnClosePanelEditProfile.click();
+						});
+					});
+				});
+			}
 		});
 
 		this.el.inputNamePanelEditProfile.on('keypress', (e)=>{
